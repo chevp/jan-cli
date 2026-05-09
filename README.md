@@ -20,13 +20,6 @@ npm install -g github:chevp/jan-cli
 This fetches jan-cli + chi, builds chi via its `prepare` hook, and wires
 `jan` (and `jan.cmd` on Windows) into npm's global bin directory.
 
-To **update** to the latest `main` of both jan-cli and chi, run the same
-command again:
-
-```sh
-npm install -g github:chevp/jan-cli
-```
-
 To remove:
 
 ```sh
@@ -55,12 +48,15 @@ cd jan-cli
 .\install.ps1
 ```
 
-To **update** a from-source install:
+## Update
+
+Once installed, jan can update itself — works for both global and from-source installs:
 
 ```sh
-git pull
-npm install         # re-fetches chi at its current pin and rebuilds
+jan update
 ```
+
+This detects the install layout and either runs `npm install -g github:chevp/jan-cli` (global) or `git pull --ff-only && npm install` (workspace clone), pulling the latest chi as a dependency in either case.
 
 ## What this is
 

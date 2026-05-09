@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
+import { existsSync, realpathSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { spawnSync } from "node:child_process";
 
 const require = createRequire(import.meta.url);
+
+if (process.argv[2] === "update") {
+  process.exit(updateJan());
+}
 
 let chiEntry;
 try {
@@ -14,3 +21,42 @@ try {
 }
 
 await import(pathToFileURL(chiEntry).href);
+
+function findPackageRoot(start) {
+  let dir = start;
+  while (true) {
+    if (existsSync(join(dir, "package.json"))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+}
+
+function updateJan() {
+  const realBin = realpathSync(process.argv[1]);
+  const root = findPackageRoot(dirname(realBin));
+  if (!root) {
+    console.error(`jan update: could not locate jan-cli package root from ${realBin}`);
+    return 1;
+  }
+
+  const isWorkspace = existsSync(join(root, ".git"));
+  const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+  const opts = { stdio: "inherit" };
+
+  if (isWorkspace) {
+    console.log(`jan update: workspace clone at ${root}`);
+    const pulled = spawnSync("git", ["-C", root, "pull", "--ff-only"], opts);
+    if (pulled.status !== 0) return pulled.status ?? 1;
+    const installed = spawnSync(
+      npm,
+      ["--prefix", root, "install", "--no-audit", "--no-fund"],
+      opts,
+    );
+    return installed.status ?? 1;
+  }
+
+  console.log("jan update: global install (github:chevp/jan-cli)");
+  const r = spawnSync(npm, ["install", "-g", "github:chevp/jan-cli"], opts);
+  return r.status ?? 1;
+}

@@ -1,6 +1,6 @@
 {
   "name": "jan-cli",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Thin wrapper that exposes chevp/chi as the `jan` command",
   "type": "module",
   "bin": {
