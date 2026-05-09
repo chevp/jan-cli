@@ -1,15 +1,16 @@
 #!/usr/bin/env node
-import { fileURLToPath, pathToFileURL } from "node:url";
-import { dirname, join } from "node:path";
-import { existsSync } from "node:fs";
+import { createRequire } from "node:module";
+import { pathToFileURL } from "node:url";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const chiCompiled = join(here, "..", "chi", "dist", "index.js");
+const require = createRequire(import.meta.url);
 
-if (!existsSync(chiCompiled)) {
-  console.error("jan: chi/dist/index.js not found.");
-  console.error("    run 'npm install' (or './install.sh' / '.\\install.ps1') to fetch and build the chi submodule.");
+let chiEntry;
+try {
+  chiEntry = require.resolve("chi/dist/index.js");
+} catch {
+  console.error("jan: could not locate the 'chi' package — was it installed?");
+  console.error("    try reinstalling:  npm install -g github:chevp/jan-cli");
   process.exit(1);
 }
 
-await import(pathToFileURL(chiCompiled).href);
+await import(pathToFileURL(chiEntry).href);

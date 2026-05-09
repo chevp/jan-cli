@@ -1,6 +1,6 @@
 {
   "name": "jan-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Thin wrapper that exposes chevp/chi as the `jan` command",
   "type": "module",
   "bin": {
@@ -8,15 +8,12 @@
   },
   "files": [
     "bin",
-    "chi",
-    "scripts",
     "install.sh",
     "install.ps1",
     "README.md"
   ],
-  "scripts": {
-    "build": "cd chi && npm install --no-audit --no-fund && npm run build",
-    "prepare": "node scripts/prepare.js"
+  "dependencies": {
+    "chi": "github:chevp/chi"
   },
   "engines": {
     "node": ">=20"

@@ -1,15 +1,15 @@
 # jan-cli
 
 A thin wrapper that exposes [chevp/chi](https://github.com/chevp/chi) under
-the command name `jan`. No source duplication — chi is pulled in as a git
-submodule and built locally; `bin/jan` just delegates to `chi/dist/index.js`.
+the command name `jan`. No source duplication — chi is pulled in as a normal
+npm dependency (git URL, no npm registry required), and `bin/jan` just
+delegates to `chi/dist/index.js`.
 
 > Same UX, same config, same workflows as `chi` — just typed as `jan`.
 
 ## Install
 
-Requires Node.js 20+ and `git` (for the submodule fetch). Works the same on
-macOS, Linux, and Windows.
+Requires Node.js 20+. Works the same on macOS, Linux, and Windows.
 
 ### Via npm (recommended)
 
@@ -17,9 +17,8 @@ macOS, Linux, and Windows.
 npm install -g github:chevp/jan-cli
 ```
 
-This clones the repo with its `chi` submodule, runs the `prepare` hook to
-build chi, and wires `jan` (and `jan.cmd` on Windows) into npm's global
-bin directory.
+This fetches jan-cli + chi, builds chi via its `prepare` hook, and wires
+`jan` (and `jan.cmd` on Windows) into npm's global bin directory.
 
 To **update** to the latest `main` of both jan-cli and chi, run the same
 command again:
@@ -43,7 +42,7 @@ npm install -g github:chevp/jan-cli#<sha-or-tag>
 ### From source (clone + script)
 
 ```sh
-git clone --recurse-submodules https://github.com/chevp/jan-cli.git
+git clone https://github.com/chevp/jan-cli.git
 cd jan-cli
 ./install.sh        # macOS / Linux / WSL
 ```
@@ -51,20 +50,16 @@ cd jan-cli
 On Windows (PowerShell):
 
 ```powershell
-git clone --recurse-submodules https://github.com/chevp/jan-cli.git
+git clone https://github.com/chevp/jan-cli.git
 cd jan-cli
 .\install.ps1
 ```
-
-If you forgot `--recurse-submodules` on the clone, run
-`git submodule update --init --recursive` once before installing.
 
 To **update** a from-source install:
 
 ```sh
 git pull
-git submodule update --remote --merge   # bump chi to latest main
-npm install                              # rebuilds chi via the prepare hook
+npm install         # re-fetches chi at its current pin and rebuilds
 ```
 
 ## What this is
@@ -72,14 +67,11 @@ npm install                              # rebuilds chi via the prepare hook
 ```
 jan-cli/
 ├── bin/
-│   ├── jan              # node shim → ../chi/dist/index.js
+│   ├── jan              # node shim → require.resolve("chi/dist/index.js")
 │   └── jan.cmd          # Windows shim
-├── chi/                 # ← git submodule pointing at chevp/chi
-├── scripts/
-│   └── prepare.js       # builds chi after npm install
 ├── install.sh
 ├── install.ps1
-└── package.json
+└── package.json         # depends on  "chi": "github:chevp/chi"
 ```
 
 `jan <args>` is functionally identical to `chi <args>`. All chi config
@@ -90,19 +82,7 @@ unchanged.
 
 So the source lives in exactly one place. If `chi` adds a new command,
 `jan` gets it on the next `npm install -g github:chevp/jan-cli` (which
-re-fetches the submodule pointer's latest commit on `main`). No duplicated
-source tree to maintain.
-
-## Bumping the chi pin
-
-Inside a clone of jan-cli:
-
-```sh
-git submodule update --remote --merge chi   # fetch chi's latest main
-git add chi
-git commit -m "bump chi pin"
-git push
-```
+re-fetches chi's latest `main`). No duplicated source tree to maintain.
 
 ## License
 
