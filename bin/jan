@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const chiCompiled = join(here, "..", "chi", "dist", "index.js");
+
+if (!existsSync(chiCompiled)) {
+  console.error("jan: chi/dist/index.js not found.");
+  console.error("    run 'npm install' (or './install.sh' / '.\\install.ps1') to fetch and build the chi submodule.");
+  process.exit(1);
+}
+
+await import(pathToFileURL(chiCompiled).href);
