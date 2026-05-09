@@ -17,8 +17,9 @@ Requires Node.js 20+. Works the same on macOS, Linux, and Windows.
 npm install -g github:chevp/jan-cli
 ```
 
-This fetches jan-cli + chi, builds chi via its `prepare` hook, and wires
-`jan` (and `jan.cmd` on Windows) into npm's global bin directory.
+This fetches jan-cli + chi (chi ships its prebuilt `dist/` in the github
+tarball) and wires `jan` (and `jan.cmd` on Windows) into npm's global bin
+directory.
 
 To remove:
 
